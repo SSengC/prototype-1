@@ -5,6 +5,7 @@
     --text-color: #e0e0e0;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     --border-color: #333;
+    --accent: #03dac6;
 }
 
 * {
@@ -17,51 +18,111 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-color);
     font-family: 'Noto Sans KR', sans-serif;
-    overflow: hidden;
-    height: 100vh;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
-/* 화면 공통 */
 .screen {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: opacity 1s ease;
+    transition: opacity 0.8s ease;
+    padding: 20px;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
     opacity: 0;
 }
 
 /* 인트로 화면 */
 #intro-screen {
     background-color: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
 }
 
 .fade-in-text {
     font-family: 'Nanum Myeongjo', serif;
     font-size: 2.5rem;
-    font-weight: 300;
     color: white;
     opacity: 0;
     animation: fadeInOut 5s forwards;
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 0; }
-    40% { opacity: 1; }
+    0% { opacity: 0; transform: translateY(10px); }
+    40% { opacity: 1; transform: translateY(0); }
     60% { opacity: 1; }
     100% { opacity: 0; }
+}
+
+/* 스토리 선택 화면 */
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: var(--primary-color);
+    font-family: 'Nanum Myeongjo', serif;
+}
+
+.story-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+.story-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.story-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 30px rgba(187, 134, 252, 0.2);
+}
+
+.story-icon {
+    font-size: 3rem;
+}
+
+.story-card h3 {
+    font-size: 1.3rem;
+    color: #fff;
+}
+
+.story-card p {
+    font-size: 0.9rem;
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.difficulty {
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: auto;
 }
 
 /* 게임 메인 */
 .game-container {
     max-width: 900px;
-    width: 95%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -85,7 +146,6 @@ body {
 .room-image {
     width: 100%;
     height: 100%;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1513519247388-4a26d7229777?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
     background-size: cover;
     background-position: center;
     position: relative;
@@ -106,7 +166,6 @@ body {
     transform: scale(1.1);
 }
 
-/* 소지품 */
 .inventory-slots {
     display: flex;
     gap: 15px;
@@ -122,16 +181,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5rem;
 }
 
-/* 메시지 박스 */
 #game-message {
-    font-size: 1.1rem;
-    min-height: 1.5rem;
     color: var(--primary-color);
+    transition: opacity 0.3s;
 }
 
-/* 버튼 */
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 .secondary-btn {
     background: transparent;
     border: 1px solid var(--primary-color);
@@ -139,7 +202,6 @@ body {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 20px;
 }
 
 .secondary-btn:hover {
@@ -148,7 +210,13 @@ body {
 }
 
 .timer {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#current-story-title {
+    font-size: 1.5rem;
     margin-bottom: 20px;
-    font-size: 1.2rem;
-    font-weight: 700;
+    color: #fff;
 }
