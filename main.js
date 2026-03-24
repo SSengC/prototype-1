@@ -8,8 +8,20 @@ const gameMessage = document.getElementById('game-message');
 const puzzleLayer = document.getElementById('puzzle-layer');
 const currentStageText = document.getElementById('current-stage');
 
+// 힌트 관련 요소
+const hintBtn = document.getElementById('hint-btn');
+const hintCountText = document.getElementById('hint-count');
+const hintModal = document.getElementById('hint-modal');
+const hintText = document.getElementById('hint-text');
+const adView = document.getElementById('ad-view');
+const hintView = document.getElementById('hint-view');
+const closeModal = document.querySelector('.close-modal');
+const adProgress = document.querySelector('.ad-progress');
+
 let currentStage = 1;
 let selectedStory = '';
+let hintsUsed = 0;
+const freeHintsLimit = 3;
 
 const storyData = {
     'library': {
@@ -18,17 +30,20 @@ const storyData = {
             {
                 name: '금지된 서고',
                 bg: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1350&q=80',
-                init: initStage1
+                init: initStage1,
+                hint: '책의 높이를 1단계부터 3단계까지 조절해보세요. 정답 패턴은 "중-하-상-중"입니다.'
             },
             {
                 name: '기억의 복도',
                 bg: 'https://images.unsplash.com/photo-1513519247388-4a26d7229777?auto=format&fit=crop&w=1350&q=80',
-                init: initStage2
+                init: initStage2,
+                hint: '시계 바늘을 클릭하면 3시간씩 돌아갑니다. 모든 바늘이 위쪽(12시)을 향하게 하세요.'
             },
             {
                 name: '과거의 교실',
                 bg: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1350&q=80',
-                init: initStage3
+                init: initStage3,
+                hint: '책상 위, 그림 근처, 그리고 바닥을 잘 살펴보세요. 반짝이는 종이 조각 3개를 찾아야 합니다.'
             }
         ]
     }
@@ -72,15 +87,67 @@ function loadStage(stageNum) {
     currentStageText.innerText = `Stage ${stageNum}`;
     roomImage.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${stage.bg}')`;
     
-    puzzleLayer.innerHTML = ''; // 이전 퍼즐 제거
+    puzzleLayer.innerHTML = ''; 
     stage.init();
 }
+
+// 힌트 시스템 로직
+hintBtn.addEventListener('click', () => {
+    if (hintsUsed < freeHintsLimit) {
+        showHint();
+    } else {
+        startAd();
+    }
+});
+
+function showHint() {
+    const stageHint = storyData['library'].stages[currentStage - 1].hint;
+    hintText.innerText = stageHint;
+    
+    adView.classList.add('hidden');
+    hintView.classList.remove('hidden');
+    hintModal.classList.remove('hidden');
+    
+    if (hintsUsed < freeHintsLimit) {
+        hintsUsed++;
+        const remaining = freeHintsLimit - hintsUsed;
+        hintCountText.innerText = remaining > 0 ? remaining : 'AD';
+        if (remaining === 0) hintBtn.innerText = '💡 힌트 (AD)';
+    }
+}
+
+function startAd() {
+    hintView.classList.add('hidden');
+    adView.classList.remove('hidden');
+    hintModal.classList.remove('hidden');
+    
+    let progress = 0;
+    adProgress.style.width = '0%';
+    
+    const adInterval = setInterval(() => {
+        progress += 2;
+        adProgress.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+            clearInterval(adInterval);
+            showHint();
+        }
+    }, 100); // 5초 시뮬레이션 (100ms * 50 steps)
+}
+
+closeModal.addEventListener('click', () => {
+    hintModal.classList.add('hidden');
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === hintModal) hintModal.classList.add('hidden');
+});
 
 // 2. Stage 1: 금지된 서고 (책장 패턴)
 function initStage1() {
     displayMessage('책장에 꽂힌 책들의 높낮이가 수상합니다. 특정 패턴을 맞춰보세요.');
     
-    const pattern = [2, 1, 3, 2]; // 정답 패턴
+    const pattern = [2, 1, 3, 2]; 
     let currentPattern = [1, 1, 1, 1];
     
     const bookContainer = document.createElement('div');
@@ -111,7 +178,7 @@ function initStage1() {
 function initStage2() {
     displayMessage('벽면의 시계들이 제각각입니다. 모든 시계를 자정(00:00)으로 맞추세요.');
     
-    const clockTimes = [3, 9, 6]; // 현재 시간들 (3시, 9시, 6시)
+    const clockTimes = [3, 9, 6]; 
     const clockContainer = document.createElement('div');
     clockContainer.className = 'clock-container';
     
