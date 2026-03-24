@@ -151,19 +151,85 @@ body {
     position: relative;
 }
 
-.clickable-item {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background-color: rgba(187, 134, 252, 0.1);
-    border: 1px dashed rgba(187, 134, 252, 0.4);
-    cursor: pointer;
-    transition: all 0.3s;
+/* 퍼즐 레이어 및 요소 */
+#puzzle-layer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.clickable-item:hover {
-    background-color: rgba(187, 134, 252, 0.3);
-    transform: scale(1.1);
+/* Stage 1: Book Shelf */
+.book-shelf {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+    border-bottom: 5px solid #5d4037;
+}
+
+.book {
+    width: 30px;
+    background: #795548;
+    border: 1px solid #3e2723;
+    cursor: pointer;
+    transition: height 0.3s ease;
+    border-radius: 3px 3px 0 0;
+}
+
+.book:hover {
+    background: #8d6e63;
+}
+
+/* Stage 2: Clocks */
+.clock-container {
+    display: flex;
+    gap: 30px;
+}
+
+.clock {
+    width: 80px;
+    height: 80px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    position: relative;
+    background: rgba(255,255,255,0.1);
+    cursor: pointer;
+}
+
+.hand {
+    width: 4px;
+    height: 35px;
+    background: var(--primary-color);
+    position: absolute;
+    bottom: 50%;
+    left: calc(50% - 2px);
+    transform-origin: bottom center;
+    transition: transform 0.3s ease;
+}
+
+/* Stage 3: Diary Pieces */
+.diary-piece {
+    position: absolute;
+    font-size: 2rem;
+    cursor: pointer;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+    transition: transform 0.2s;
+}
+
+.diary-piece:hover {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.header-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 10px;
 }
 
 .inventory-slots {

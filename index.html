@@ -47,16 +47,18 @@
     <!-- 3. 게임 메인 화면 -->
     <div id="game-screen" class="screen hidden">
         <header>
-            <div class="timer">남은 시간: <span id="time-left">60:00</span></div>
+            <div class="header-info">
+                <div class="timer">남은 시간: <span id="time-left">60:00</span></div>
+                <div class="stage-info">현재 단계: <span id="current-stage">Stage 1</span></div>
+            </div>
             <h2 id="current-story-title">스토리 제목</h2>
         </header>
 
         <main class="game-container">
             <div class="room-view card">
                 <div class="room-image" id="room-image">
-                    <div class="clickable-item" id="item-desk" style="top: 60%; left: 20%;"></div>
-                    <div class="clickable-item" id="item-painting" style="top: 20%; left: 70%;"></div>
-                    <div class="clickable-item" id="item-door" style="top: 40%; left: 45%;"></div>
+                    <!-- 퍼즐 요소들이 동적으로 생성될 영역 -->
+                    <div id="puzzle-layer"></div>
                 </div>
             </div>
 
