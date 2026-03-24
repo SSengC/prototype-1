@@ -2,6 +2,8 @@ const imageUpload = document.getElementById('image-upload');
 const originalImage = document.getElementById('original-image');
 const modifiedImage = document.getElementById('modified-image');
 const addClosetBtn = document.getElementById('add-closet-btn');
+const originalEmpty = document.getElementById('original-empty');
+const modifiedEmpty = document.getElementById('modified-empty');
 
 imageUpload.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -10,8 +12,11 @@ imageUpload.addEventListener('change', (e) => {
         reader.onload = (event) => {
             originalImage.src = event.target.result;
             originalImage.style.display = 'block';
+            originalEmpty.style.display = 'none';
+            
             modifiedImage.src = event.target.result;
             modifiedImage.style.display = 'block';
+            modifiedEmpty.style.display = 'none';
         };
         reader.readAsDataURL(file);
     }
@@ -19,6 +24,10 @@ imageUpload.addEventListener('change', (e) => {
 
 addClosetBtn.addEventListener('click', () => {
     if (originalImage.src && originalImage.src !== '#' && originalImage.src.startsWith('data:image')) {
+        // UI Feedback
+        addClosetBtn.innerText = '설치 중...';
+        addClosetBtn.disabled = true;
+
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const baseImage = new Image();
@@ -28,31 +37,37 @@ addClosetBtn.addEventListener('click', () => {
             canvas.height = baseImage.height;
             ctx.drawImage(baseImage, 0, 0);
 
-            // 가상의 붙박이장 이미지를 불러오거나, 실패 시 사각형을 그립니다.
-            const closetImage = new Image();
-            // 무료로 사용할 수 있는 붙박이장 또는 유사한 이미지 URL (테스트용)
-            closetImage.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'; // 대체 이미지 사용 시도
-            closetImage.crossOrigin = "Anonymous";
-
-            closetImage.onload = () => {
+            // 가상의 붙박이장 효과 (브라운 톤 반투명 오버레이 + 선 표현)
+            setTimeout(() => {
                 const closetWidth = canvas.width * 0.4;
-                const closetHeight = canvas.height * 0.7;
+                const closetHeight = canvas.height * 0.8;
                 const closetX = canvas.width * 0.1;
-                const closetY = canvas.height * 0.2;
+                const closetY = canvas.height * 0.15;
 
-                ctx.drawImage(closetImage, closetX, closetY, closetWidth, closetHeight);
-                modifiedImage.src = canvas.toDataURL();
-            };
+                // 그라데이션을 통한 고급스러운 느낌 추가
+                const gradient = ctx.createLinearGradient(closetX, closetY, closetX + closetWidth, closetY);
+                gradient.addColorStop(0, 'rgba(84, 60, 43, 0.85)');
+                gradient.addColorStop(1, 'rgba(60, 45, 30, 0.9)');
 
-            closetImage.onerror = () => {
-                // 이미지를 불러오지 못할 경우 스타일링된 사각형으로 대체
-                ctx.fillStyle = 'rgba(100, 70, 40, 0.8)'; // 나무 색상 계열
-                ctx.fillRect(canvas.width * 0.1, canvas.height * 0.2, canvas.width * 0.4, canvas.height * 0.7);
-                ctx.strokeStyle = '#333';
+                ctx.fillStyle = gradient;
+                ctx.fillRect(closetX, closetY, closetWidth, closetHeight);
+                
+                // 도어 라인 표현
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.2, canvas.width * 0.4, canvas.height * 0.7);
+                ctx.strokeRect(closetX, closetY, closetWidth, closetHeight);
+                
+                // 세로선 (도어 구분선)
+                ctx.beginPath();
+                ctx.moveTo(closetX + closetWidth/2, closetY);
+                ctx.lineTo(closetX + closetWidth/2, closetY + closetHeight);
+                ctx.stroke();
+
                 modifiedImage.src = canvas.toDataURL();
-            };
+                
+                addClosetBtn.innerHTML = '<span class="btn-icon">✨</span> 붙박이장 자동 설치하기';
+                addClosetBtn.disabled = false;
+            }, 800); // 인공지능 처리 느낌을 위한 딜레이
         };
     } else {
         alert('먼저 방 사진을 선택해 주세요.');
