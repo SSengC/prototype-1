@@ -46,15 +46,17 @@
 
     <!-- 3. 게임 메인 화면 -->
     <div id="game-screen" class="screen hidden">
-        <header>
-            <div class="header-info">
+        <header class="game-header">
+            <div class="header-left">
                 <div class="timer">남은 시간: <span id="time-left">60:00</span></div>
                 <div class="stage-info">현재 단계: <span id="current-stage">Stage 1</span></div>
-                <div class="hint-container">
-                    <button id="hint-btn" class="hint-btn">💡 힌트 (<span id="hint-count">3</span>)</button>
-                </div>
             </div>
-            <h2 id="current-story-title">스토리 제목</h2>
+            <div class="header-center">
+                <h2 id="current-story-title">스토리 제목</h2>
+            </div>
+            <div class="header-right">
+                <button id="hint-btn" class="hint-btn">💡 힌트 (<span id="hint-count">3</span>)</button>
+            </div>
         </header>
 
         <!-- 광고/힌트 모달 -->
@@ -76,7 +78,6 @@
         <main class="game-container">
             <div class="room-view card">
                 <div class="room-image" id="room-image">
-                    <!-- 퍼즐 요소들이 동적으로 생성될 영역 -->
                     <div id="puzzle-layer"></div>
                 </div>
             </div>

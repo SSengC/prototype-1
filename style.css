@@ -28,7 +28,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* 상단부터 배치 */
     transition: opacity 0.8s ease;
     padding: 20px;
 }
@@ -44,7 +44,8 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 1000;
+    justify-content: center;
 }
 
 .fade-in-text {
@@ -62,20 +63,64 @@ body {
     100% { opacity: 0; }
 }
 
-/* 스토리 선택 화면 */
-.section-title {
-    font-size: 2rem;
-    margin-bottom: 40px;
-    color: var(--primary-color);
-    font-family: 'Nanum Myeongjo', serif;
+/* 게임 헤더 - 힌트 버튼 포함 */
+.game-header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
+.header-left, .header-right {
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.header-center {
+    flex: 2;
+    text-align: center;
+}
+
+.timer, .stage-info {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+/* 힌트 버튼 스타일 */
+.hint-btn {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+}
+
+.hint-btn:hover {
+    background-color: #f57c00;
+    transform: scale(1.05);
+}
+
+/* 스토리 선택 화면 */
 .story-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
     width: 100%;
     max-width: 1100px;
+    margin-top: 40px;
 }
 
 .story-card {
@@ -86,40 +131,14 @@ body {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
 }
 
 .story-card:hover {
     transform: translateY(-10px);
     border-color: var(--primary-color);
-    box-shadow: 0 10px 30px rgba(187, 134, 252, 0.2);
 }
 
-.story-icon {
-    font-size: 3rem;
-}
-
-.story-card h3 {
-    font-size: 1.3rem;
-    color: #fff;
-}
-
-.story-card p {
-    font-size: 0.9rem;
-    color: #aaa;
-    line-height: 1.5;
-}
-
-.difficulty {
-    font-size: 0.8rem;
-    color: var(--accent);
-    margin-top: auto;
-}
-
-/* 게임 메인 */
+/* 게임 컨테이너 */
 .game-container {
     max-width: 900px;
     width: 100%;
@@ -148,10 +167,9 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
-    position: relative;
 }
 
-/* 퍼즐 레이어 및 요소 */
+/* 퍼즐 요소 */
 #puzzle-layer {
     width: 100%;
     height: 100%;
@@ -161,195 +179,35 @@ body {
     justify-content: center;
 }
 
-/* Stage 1: Book Shelf */
-.book-shelf {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    background: rgba(0,0,0,0.3);
-    padding: 20px;
-    border-bottom: 5px solid #5d4037;
-}
+.book-shelf { display: flex; align-items: flex-end; gap: 10px; padding: 20px; }
+.book { width: 30px; background: #795548; cursor: pointer; transition: height 0.3s; }
+.clock { width: 80px; height: 80px; border: 4px solid #fff; border-radius: 50%; position: relative; cursor: pointer; }
+.hand { width: 4px; height: 35px; background: var(--primary-color); position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
 
-.book {
-    width: 30px;
-    background: #795548;
-    border: 1px solid #3e2723;
-    cursor: pointer;
-    transition: height 0.3s ease;
-    border-radius: 3px 3px 0 0;
-}
-
-.book:hover {
-    background: #8d6e63;
-}
-
-/* Stage 2: Clocks */
-.clock-container {
-    display: flex;
-    gap: 30px;
-}
-
-.clock {
-    width: 80px;
-    height: 80px;
-    border: 4px solid #fff;
-    border-radius: 50%;
-    position: relative;
-    background: rgba(255,255,255,0.1);
-    cursor: pointer;
-}
-
-.hand {
-    width: 4px;
-    height: 35px;
-    background: var(--primary-color);
-    position: absolute;
-    bottom: 50%;
-    left: calc(50% - 2px);
-    transform-origin: bottom center;
-    transition: transform 0.3s ease;
-}
-
-/* Stage 3: Diary Pieces */
-.diary-piece {
-    position: absolute;
-    font-size: 2rem;
-    cursor: pointer;
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
-    transition: transform 0.2s;
-}
-
-.diary-piece:hover {
-    transform: scale(1.2) rotate(10deg);
-}
-
-.header-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 10px;
-}
-
-/* 힌트 버튼 */
-.hint-btn {
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.hint-btn:hover {
-    background-color: #f57c00;
-    transform: scale(1.05);
-}
-
-/* 모달 디자인 */
+/* 모달 */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.9);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2000;
 }
 
 .modal-content {
-    background-color: var(--card-bg);
+    background: var(--card-bg);
     padding: 40px;
     border-radius: 20px;
-    max-width: 400px;
-    width: 90%;
-    position: relative;
+    border: 1px solid var(--primary-color);
     text-align: center;
-    border: 1px solid var(--primary-color);
+    position: relative;
 }
 
-.close-modal {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--text-color);
-}
+.ad-progress-bar { width: 100%; height: 8px; background: #333; margin-top: 20px; }
+.ad-progress { width: 0%; height: 100%; background: var(--accent); }
 
-/* 광고 프로그레스 바 */
-.ad-progress-bar {
-    width: 100%;
-    height: 8px;
-    background-color: #333;
-    border-radius: 4px;
-    margin-top: 20px;
-    overflow: hidden;
-}
-
-.ad-progress {
-    width: 0%;
-    height: 100%;
-    background-color: var(--accent);
-}
-
-.inventory-slots {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.slot {
-    width: 60px;
-    height: 60px;
-    background: #2a2a2a;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
-#game-message {
-    color: var(--primary-color);
-    transition: opacity 0.3s;
-}
-
-.controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.secondary-btn {
-    background: transparent;
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.secondary-btn:hover {
-    background: var(--primary-color);
-    color: var(--bg-dark);
-}
-
-.timer {
-    font-size: 1.1rem;
-    font-weight: bold;
-}
-
-#current-story-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    color: #fff;
-}
+.close-modal { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; }
