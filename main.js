@@ -1,25 +1,25 @@
+// 1. DOM 요소 참조
 const introScreen = document.getElementById('intro-screen');
 const storySelectionScreen = document.getElementById('story-selection-screen');
 const gameScreen = document.getElementById('game-screen');
-const storyCards = document.querySelectorAll('.story-card');
+const storyCards = document.querySelectorAll('.story-card:not(.disabled)');
+
 const currentStoryTitle = document.getElementById('current-story-title');
+const currentStageText = document.getElementById('current-stage');
 const roomImage = document.getElementById('room-image');
 const gameMessage = document.getElementById('game-message');
 const puzzleLayer = document.getElementById('puzzle-layer');
-const currentStageText = document.getElementById('current-stage');
 
-// 힌트 관련 요소
 const hintBtn = document.getElementById('hint-btn');
 const hintCountText = document.getElementById('hint-count');
 const hintModal = document.getElementById('hint-modal');
 const hintText = document.getElementById('hint-text');
 const adView = document.getElementById('ad-view');
 const hintView = document.getElementById('hint-view');
-const closeModal = document.querySelector('.close-modal');
 const adProgress = document.querySelector('.ad-progress');
 
+// 2. 게임 상태 변수
 let currentStage = 1;
-let selectedStory = '';
 let hintsUsed = 0;
 const freeHintsLimit = 3;
 
@@ -31,221 +31,188 @@ const storyData = {
                 name: '금지된 서고',
                 bg: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1350&q=80',
                 init: initStage1,
-                hint: '책의 높이를 1단계부터 3단계까지 조절해보세요. 정답 패턴은 "중-하-상-중"입니다.'
+                hint: '책의 높이를 클릭해 조절하세요. 정답 패턴은 "중(2)-하(1)-상(3)-중(2)"입니다.'
             },
             {
                 name: '기억의 복도',
                 bg: 'https://images.unsplash.com/photo-1513519247388-4a26d7229777?auto=format&fit=crop&w=1350&q=80',
                 init: initStage2,
-                hint: '시계 바늘을 클릭하면 3시간씩 돌아갑니다. 모든 바늘이 위쪽(12시)을 향하게 하세요.'
+                hint: '모든 시계 바늘이 12시(0도)를 향하게 만드세요. 시계를 클릭하면 3시간씩 돌아갑니다.'
             },
             {
                 name: '과거의 교실',
                 bg: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1350&q=80',
                 init: initStage3,
-                hint: '책상 위, 그림 근처, 그리고 바닥을 잘 살펴보세요. 반짝이는 종이 조각 3개를 찾아야 합니다.'
+                hint: '화면 곳곳에 숨겨진 종이 조각 3개를 찾아 클릭하세요.'
             }
         ]
     }
 };
 
-// 1. 화면 전환 로직
+// 3. 초기 실행: 인트로 종료 후 스토리 선택 화면 표시
 setTimeout(() => {
     introScreen.style.opacity = '0';
     setTimeout(() => {
         introScreen.classList.add('hidden');
         storySelectionScreen.classList.remove('hidden');
-        storySelectionScreen.style.opacity = '1';
     }, 1000);
 }, 5000);
 
+// 4. 스토리 선택 이벤트
 storyCards.forEach(card => {
     card.addEventListener('click', () => {
-        selectedStory = card.getAttribute('data-story');
-        if (selectedStory === 'library') {
+        const story = card.getAttribute('data-story');
+        if (story === 'library') {
             startGame();
-        } else {
-            alert('이 스토리는 준비 중입니다. 자정의 도서관을 선택해 주세요.');
         }
     });
 });
 
 function startGame() {
-    storySelectionScreen.style.opacity = '0';
-    setTimeout(() => {
-        storySelectionScreen.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
-        gameScreen.style.opacity = '1';
-        loadStage(1);
-    }, 800);
+    storySelectionScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    loadStage(1);
 }
 
 function loadStage(stageNum) {
     currentStage = stageNum;
     const stage = storyData['library'].stages[stageNum - 1];
+    
     currentStoryTitle.innerText = `자정의 도서관 - ${stage.name}`;
     currentStageText.innerText = `Stage ${stageNum}`;
-    roomImage.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${stage.bg}')`;
+    roomImage.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${stage.bg}')`;
     
-    puzzleLayer.innerHTML = ''; 
+    puzzleLayer.innerHTML = '';
     stage.init();
 }
 
-// 힌트 시스템 로직
-hintBtn.addEventListener('click', () => {
-    if (hintsUsed < freeHintsLimit) {
-        showHint();
-    } else {
-        startAd();
-    }
-});
-
-function showHint() {
-    const stageHint = storyData['library'].stages[currentStage - 1].hint;
-    hintText.innerText = stageHint;
-    
-    adView.classList.add('hidden');
-    hintView.classList.remove('hidden');
-    hintModal.classList.remove('hidden');
-    
-    if (hintsUsed < freeHintsLimit) {
-        hintsUsed++;
-        const remaining = freeHintsLimit - hintsUsed;
-        hintCountText.innerText = remaining > 0 ? remaining : 'AD';
-        if (remaining === 0) hintBtn.innerText = '💡 힌트 (AD)';
-    }
-}
-
-function startAd() {
-    hintView.classList.add('hidden');
-    adView.classList.remove('hidden');
-    hintModal.classList.remove('hidden');
-    
-    let progress = 0;
-    adProgress.style.width = '0%';
-    
-    const adInterval = setInterval(() => {
-        progress += 2;
-        adProgress.style.width = `${progress}%`;
-        
-        if (progress >= 100) {
-            clearInterval(adInterval);
-            showHint();
-        }
-    }, 100); // 5초 시뮬레이션 (100ms * 50 steps)
-}
-
-closeModal.addEventListener('click', () => {
-    hintModal.classList.add('hidden');
-});
-
-window.addEventListener('click', (e) => {
-    if (e.target === hintModal) hintModal.classList.add('hidden');
-});
-
-// 2. Stage 1: 금지된 서고 (책장 패턴)
+// 5. 스테이지별 퍼즐 구현
 function initStage1() {
-    displayMessage('책장에 꽂힌 책들의 높낮이가 수상합니다. 특정 패턴을 맞춰보세요.');
+    displayMessage('책장에 꽂힌 책들의 높낮이를 맞춰 비밀 통로를 여세요.');
+    const pattern = [2, 1, 3, 2];
+    let current = [1, 1, 1, 1];
     
-    const pattern = [2, 1, 3, 2]; 
-    let currentPattern = [1, 1, 1, 1];
-    
-    const bookContainer = document.createElement('div');
-    bookContainer.className = 'book-shelf';
+    const shelf = document.createElement('div');
+    shelf.className = 'book-shelf';
     
     for (let i = 0; i < 4; i++) {
         const book = document.createElement('div');
         book.className = 'book';
-        book.style.height = (currentPattern[i] * 30 + 40) + 'px';
-        book.addEventListener('click', () => {
-            currentPattern[i] = (currentPattern[i] % 3) + 1;
-            book.style.height = (currentPattern[i] * 30 + 40) + 'px';
-            checkPattern();
-        });
-        bookContainer.appendChild(book);
+        book.style.height = (current[i] * 30 + 40) + 'px';
+        book.onclick = () => {
+            current[i] = (current[i] % 3) + 1;
+            book.style.height = (current[i] * 30 + 40) + 'px';
+            if (JSON.stringify(current) === JSON.stringify(pattern)) {
+                displayMessage('비밀 통로가 열렸습니다!');
+                setTimeout(() => loadStage(2), 1500);
+            }
+        };
+        shelf.appendChild(book);
     }
-    puzzleLayer.appendChild(bookContainer);
-
-    function checkPattern() {
-        if (JSON.stringify(currentPattern) === JSON.stringify(pattern)) {
-            displayMessage('철컥! 서고의 비밀 통로가 열렸습니다.');
-            setTimeout(() => loadStage(2), 1500);
-        }
-    }
+    puzzleLayer.appendChild(shelf);
 }
 
-// 3. Stage 2: 기억의 복도 (시계 맞추기)
 function initStage2() {
-    displayMessage('벽면의 시계들이 제각각입니다. 모든 시계를 자정(00:00)으로 맞추세요.');
+    displayMessage('모든 시계를 자정(12시)으로 맞추세요.');
+    const times = [3, 9, 6];
+    const container = document.createElement('div');
+    container.className = 'clock-container';
     
-    const clockTimes = [3, 9, 6]; 
-    const clockContainer = document.createElement('div');
-    clockContainer.className = 'clock-container';
-    
-    clockTimes.forEach((time, index) => {
+    times.forEach((t, i) => {
         const clock = document.createElement('div');
         clock.className = 'clock';
-        clock.innerHTML = `<div class="hand" style="transform: rotate(${time * 30}deg)"></div>`;
-        clock.addEventListener('click', () => {
-            clockTimes[index] = (clockTimes[index] + 3) % 12;
-            clock.querySelector('.hand').style.transform = `rotate(${clockTimes[index] * 30}deg)`;
-            if (clockTimes.every(t => t === 0)) {
-                displayMessage('자정의 종소리와 함께 교실 문이 열립니다.');
+        clock.innerHTML = `<div class="hand" style="transform: rotate(${t * 30}deg)"></div>`;
+        clock.onclick = () => {
+            times[i] = (times[i] + 3) % 12;
+            clock.querySelector('.hand').style.transform = `rotate(${times[i] * 30}deg)`;
+            if (times.every(v => v === 0)) {
+                displayMessage('교실 문이 열렸습니다.');
                 setTimeout(() => loadStage(3), 1500);
             }
-        });
-        clockContainer.appendChild(clock);
+        };
+        container.appendChild(clock);
     });
-    puzzleLayer.appendChild(clockContainer);
+    puzzleLayer.appendChild(container);
 }
 
-// 4. Stage 3: 과거의 교실 (일기 조각 모으기)
 function initStage3() {
-    displayMessage('책상 위에 흩어진 일기장 조각 3개를 모아 특정 날짜를 찾아내세요.');
-    let foundPieces = 0;
+    displayMessage('흩어진 일기장 조각 3개를 찾으세요.');
+    let found = 0;
+    const pos = [{t:'20%',l:'30%'}, {t:'70%',l:'60%'}, {t:'40%',l:'10%'}];
     
-    const positions = [
-        { t: '60%', l: '20%' },
-        { t: '30%', l: '70%' },
-        { t: '50%', l: '50%' }
-    ];
-    
-    positions.forEach((pos, i) => {
+    pos.forEach(p => {
         const piece = document.createElement('div');
         piece.className = 'diary-piece';
         piece.innerText = '📄';
-        piece.style.top = pos.t;
-        piece.style.left = pos.l;
-        piece.addEventListener('click', () => {
-            piece.style.display = 'none';
-            foundPieces++;
+        piece.style.top = p.t; piece.style.left = p.l;
+        piece.onclick = () => {
+            piece.remove();
+            found++;
             addToInventory('📄');
-            if (foundPieces === 3) {
-                displayMessage('일기장을 완성했습니다! "1998년 3월 24일"... 현실로 돌아갑니다.');
-                setTimeout(() => {
-                    alert('탈출 성공! 당신은 무사히 현실로 돌아왔습니다.');
-                    location.reload();
-                }, 2000);
-            } else {
-                displayMessage(`조각을 찾았습니다. (${foundPieces}/3)`);
+            if (found === 3) {
+                displayMessage('일기장을 완성했습니다! 현실로 귀환합니다.');
+                setTimeout(() => { alert('탈출 성공!'); location.reload(); }, 2000);
             }
-        });
+        };
         puzzleLayer.appendChild(piece);
     });
 }
 
+// 6. UI 보조 기능 (힌트, 메시지 등)
 function displayMessage(msg) {
-    gameMessage.style.opacity = '0';
-    setTimeout(() => {
-        gameMessage.innerText = msg;
-        gameMessage.style.opacity = '1';
-    }, 200);
+    gameMessage.innerText = msg;
 }
 
-function addToInventory(icon) {
-    const emptySlot = Array.from(document.querySelectorAll('.slot')).find(s => s.innerText === '');
-    if (emptySlot) emptySlot.innerText = icon;
+function addToInventory(item) {
+    const slots = document.querySelectorAll('.slot');
+    for (let slot of slots) {
+        if (slot.innerText === '') {
+            slot.innerText = item;
+            break;
+        }
+    }
 }
 
-document.getElementById('back-to-stories').addEventListener('click', () => location.reload());
-document.getElementById('restart-btn').addEventListener('click', () => loadStage(1));
+hintBtn.onclick = () => {
+    if (hintsUsed < freeHintsLimit) {
+        showHintModal();
+        hintsUsed++;
+        updateHintUI();
+    } else {
+        showAdModal();
+    }
+};
+
+function updateHintUI() {
+    const remaining = freeHintsLimit - hintsUsed;
+    hintCountText.innerText = remaining > 0 ? remaining : 'AD';
+}
+
+function showHintModal() {
+    const hint = storyData['library'].stages[currentStage - 1].hint;
+    hintText.innerText = hint;
+    adView.classList.add('hidden');
+    hintView.classList.remove('hidden');
+    hintModal.classList.remove('hidden');
+}
+
+function showAdModal() {
+    hintView.classList.add('hidden');
+    adView.classList.remove('hidden');
+    hintModal.classList.remove('hidden');
+    adProgress.style.width = '0%';
+    
+    let p = 0;
+    const interval = setInterval(() => {
+        p += 2;
+        adProgress.style.width = p + '%';
+        if (p >= 100) {
+            clearInterval(interval);
+            showHintModal();
+        }
+    }, 100);
+}
+
+document.querySelector('.close-modal').onclick = () => hintModal.classList.add('hidden');
+document.getElementById('back-to-stories').onclick = () => location.reload();
+document.getElementById('restart-btn').onclick = () => loadStage(1);

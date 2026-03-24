@@ -17,29 +17,26 @@
     <div id="story-selection-screen" class="screen hidden">
         <h2 class="section-title">플레이할 스토리를 선택하세요</h2>
         <div class="story-grid">
-            <div class="story-card" data-story="closet">
-                <div class="story-icon">🚪</div>
-                <h3>사라진 붙박이장</h3>
-                <p>평범했던 방, 벽장 너머에서 들려오는 이상한 소리의 정체는?</p>
-                <span class="difficulty">난이도: ★★☆☆☆</span>
-            </div>
             <div class="story-card" data-story="library">
                 <div class="story-icon">📚</div>
                 <h3>자정의 도서관</h3>
                 <p>금지된 구역의 책 한 권이 당신을 과거의 기억으로 초대합니다.</p>
                 <span class="difficulty">난이도: ★★★☆☆</span>
             </div>
-            <div class="story-card" data-story="laboratory">
-                <div class="story-icon">🧪</div>
-                <h3>모모의 비밀 실험실</h3>
-                <p>천재 과학자 모모가 남긴 마지막 퍼즐을 풀어 탈출하세요.</p>
-                <span class="difficulty">난이도: ★★★★☆</span>
+            <div class="story-card disabled" data-story="closet">
+                <div class="story-icon">🚪</div>
+                <h3>사라진 붙박이장</h3>
+                <p>(준비 중)</p>
             </div>
-            <div class="story-card" data-story="dream">
+            <div class="story-card disabled" data-story="laboratory">
+                <div class="story-icon">🧪</div>
+                <h3>비밀 실험실</h3>
+                <p>(준비 중)</p>
+            </div>
+            <div class="story-card disabled" data-story="dream">
                 <div class="story-icon">🌙</div>
-                <h3>달빛 아래 꿈의 조각</h3>
-                <p>꿈과 현실의 경계에서 길을 잃은 당신, 조각을 모아 깨어나세요.</p>
-                <span class="difficulty">난이도: ★★★★★</span>
+                <h3>꿈의 조각</h3>
+                <p>(준비 중)</p>
             </div>
         </div>
     </div>
@@ -52,7 +49,7 @@
                 <div class="stage-info">현재 단계: <span id="current-stage">Stage 1</span></div>
             </div>
             <div class="header-center">
-                <h2 id="current-story-title">스토리 제목</h2>
+                <h2 id="current-story-title">자정의 도서관</h2>
             </div>
             <div class="header-right">
                 <button id="hint-btn" class="hint-btn">💡 힌트 (<span id="hint-count">3</span>)</button>
@@ -82,17 +79,19 @@
                 </div>
             </div>
 
-            <div class="inventory card">
-                <h3>소지품</h3>
-                <div class="inventory-slots">
-                    <div class="slot" id="slot-1"></div>
-                    <div class="slot" id="slot-2"></div>
-                    <div class="slot" id="slot-3"></div>
+            <div class="bottom-area">
+                <div class="inventory card">
+                    <h3>소지품</h3>
+                    <div class="inventory-slots">
+                        <div class="slot" id="slot-1"></div>
+                        <div class="slot" id="slot-2"></div>
+                        <div class="slot" id="slot-3"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="message-box card">
-                <p id="game-message">무엇인가가 당신을 기다리고 있습니다...</p>
+                <div class="message-box card">
+                    <p id="game-message">무엇인가가 당신을 기다리고 있습니다...</p>
+                </div>
             </div>
         </main>
 
