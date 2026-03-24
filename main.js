@@ -1,75 +1,56 @@
-const imageUpload = document.getElementById('image-upload');
-const originalImage = document.getElementById('original-image');
-const modifiedImage = document.getElementById('modified-image');
-const addClosetBtn = document.getElementById('add-closet-btn');
-const originalEmpty = document.getElementById('original-empty');
-const modifiedEmpty = document.getElementById('modified-empty');
+const introScreen = document.getElementById('intro-screen');
+const gameScreen = document.getElementById('game-screen');
+const gameMessage = document.getElementById('game-message');
+const items = document.querySelectorAll('.clickable-item');
 
-imageUpload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            originalImage.src = event.target.result;
-            originalImage.style.display = 'block';
-            originalEmpty.style.display = 'none';
-            
-            modifiedImage.src = event.target.result;
-            modifiedImage.style.display = 'block';
-            modifiedEmpty.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-    }
+// 1. 인트로 애니메이션 후 화면 전환
+setTimeout(() => {
+    introScreen.style.opacity = '0';
+    setTimeout(() => {
+        introScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        setTimeout(() => {
+            gameScreen.style.opacity = '1';
+        }, 50);
+    }, 1000);
+}, 5000); // 애니메이션 지속 시간에 맞춤
+
+// 2. 게임 상호작용 로직
+const itemData = {
+    'item-desk': '책상 위에는 낡은 열쇠 하나가 놓여 있습니다.',
+    'item-painting': '그림 뒤에 무언가 숨겨져 있는 것 같습니다.',
+    'item-door': '문이 굳게 잠겨 있습니다. 열쇠가 필요할 것 같습니다.'
+};
+
+items.forEach(item => {
+    item.addEventListener('click', () => {
+        const id = item.id;
+        const message = itemData[id];
+        displayMessage(message);
+        
+        if (id === 'item-desk') {
+            addToInventory('🔑');
+        }
+    });
 });
 
-addClosetBtn.addEventListener('click', () => {
-    if (originalImage.src && originalImage.src !== '#' && originalImage.src.startsWith('data:image')) {
-        // UI Feedback
-        addClosetBtn.innerText = '설치 중...';
-        addClosetBtn.disabled = true;
+function displayMessage(msg) {
+    gameMessage.style.opacity = '0';
+    setTimeout(() => {
+        gameMessage.innerText = msg;
+        gameMessage.style.opacity = '1';
+    }, 200);
+}
 
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const baseImage = new Image();
-        baseImage.src = originalImage.src;
-        baseImage.onload = () => {
-            canvas.width = baseImage.width;
-            canvas.height = baseImage.height;
-            ctx.drawImage(baseImage, 0, 0);
-
-            // 가상의 붙박이장 효과 (브라운 톤 반투명 오버레이 + 선 표현)
-            setTimeout(() => {
-                const closetWidth = canvas.width * 0.4;
-                const closetHeight = canvas.height * 0.8;
-                const closetX = canvas.width * 0.1;
-                const closetY = canvas.height * 0.15;
-
-                // 그라데이션을 통한 고급스러운 느낌 추가
-                const gradient = ctx.createLinearGradient(closetX, closetY, closetX + closetWidth, closetY);
-                gradient.addColorStop(0, 'rgba(84, 60, 43, 0.85)');
-                gradient.addColorStop(1, 'rgba(60, 45, 30, 0.9)');
-
-                ctx.fillStyle = gradient;
-                ctx.fillRect(closetX, closetY, closetWidth, closetHeight);
-                
-                // 도어 라인 표현
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(closetX, closetY, closetWidth, closetHeight);
-                
-                // 세로선 (도어 구분선)
-                ctx.beginPath();
-                ctx.moveTo(closetX + closetWidth/2, closetY);
-                ctx.lineTo(closetX + closetWidth/2, closetY + closetHeight);
-                ctx.stroke();
-
-                modifiedImage.src = canvas.toDataURL();
-                
-                addClosetBtn.innerHTML = '<span class="btn-icon">✨</span> 붙박이장 자동 설치하기';
-                addClosetBtn.disabled = false;
-            }, 800); // 인공지능 처리 느낌을 위한 딜레이
-        };
-    } else {
-        alert('먼저 방 사진을 선택해 주세요.');
+function addToInventory(icon) {
+    const firstSlot = document.querySelector('.slot:empty') || document.getElementById('slot-1');
+    if (firstSlot.innerText === '') {
+        firstSlot.innerText = icon;
+        displayMessage('열쇠를 획득했습니다!');
     }
+}
+
+// 3. 다시 시작 버튼
+document.getElementById('restart-btn').addEventListener('click', () => {
+    location.reload();
 });
